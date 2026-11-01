@@ -6,264 +6,253 @@
 <title>컨트리볼 채널 규정</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-:root{
-  --ink:#111; --sub:#8b9099; --line:#eeeeee; --card:#f6f6f7;
-  --accent:#e4002b; --accent-soft:#fff0f2; --ease:cubic-bezier(.2,.8,.2,1);
-}
+:root{--ink:#0e0e10;--sub:#9a9ca3;--line:#ececee;--red:#e4002b}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:#fff;color:var(--ink);
-  font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;
-  overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none}
+html,body{width:100%;height:100%;background:#fff;overflow:hidden;cursor:none}
+body{font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
 
-/* ---------- 상단/하단 UI ---------- */
-.top{position:fixed;top:28px;left:8vw;right:8vw;display:flex;justify-content:space-between;
-  font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--sub);z-index:5}
-.top b{color:var(--ink)}
-.progress{position:fixed;left:8vw;right:8vw;bottom:32px;display:flex;gap:6px;z-index:5}
-.seg{flex:1;height:3px;background:var(--line);border-radius:3px;overflow:hidden;cursor:pointer}
-.seg i{display:block;height:100%;width:0;background:var(--ink)}
-.hint{position:fixed;right:8vw;bottom:48px;font-size:12px;color:var(--sub);z-index:5}
-.paused .hint::before{content:"일시정지됨 · ";color:var(--accent);font-weight:600}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;margin:-540px 0 0 -960px;
+  transform-origin:50% 50%;overflow:hidden;background:#fff}
 
-/* ---------- 장면 ---------- */
-.scene{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
-  padding:90px 8vw 100px;opacity:0;pointer-events:none;transition:opacity .6s}
-.scene.active{opacity:1;pointer-events:auto}
-.tag{font-size:13px;font-weight:700;letter-spacing:.2em;color:var(--accent);margin-bottom:12px}
-.title{font-size:clamp(32px,4.6vw,60px);font-weight:800;letter-spacing:-.035em;line-height:1.12;margin-bottom:36px}
-.desc{font-size:15px;color:var(--sub);margin-top:24px}
+.scene{position:absolute;inset:0}
+.abs{position:absolute}
+.fit{white-space:nowrap;overflow:hidden}
+.tag{font-size:22px;font-weight:700;letter-spacing:.22em;color:var(--red)}
+.title{font-size:100px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.desc{font-size:26px;line-height:1.5;color:var(--sub);font-weight:500}
 
-/* 순차 등장 */
-.r{opacity:0;transform:translateY(22px);
-  transition:opacity .7s var(--ease),transform .7s var(--ease);
-  transition-delay:calc(var(--i,0) * 65ms + 120ms)}
-.scene.active .r{opacity:1;transform:none}
+.list{position:absolute;left:760px;top:180px;width:1020px;height:720px;display:flex;flex-direction:column;justify-content:center}
+.row{position:relative;display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:center;column-gap:24px}
+.row .n{font-size:24px;font-weight:700;color:var(--red);font-variant-numeric:tabular-nums}
+.row .t{font-size:38px;font-weight:600;letter-spacing:-.02em;line-height:1.25}
+.row .t.hl{color:var(--red);font-weight:800}
+.row .s{font-size:24px;color:var(--sub);font-weight:500;margin-top:6px;line-height:1.3}
+.row .lab{font-size:22px;color:var(--sub);font-weight:600;margin-bottom:10px;line-height:1.3}
+.row .p{font-size:24px;font-weight:700;padding:10px 22px;border-radius:99px;background:#fff0f2;color:var(--red);white-space:nowrap}
+.row .p.k{background:var(--ink);color:#fff}
+.row .ln{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--line);transform-origin:left}
+.cell{min-width:0}
 
-/* ---------- 카드 그리드 ---------- */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
-.item{background:var(--card);border-radius:14px;padding:16px 18px;font-size:15.5px;
-  font-weight:500;line-height:1.45;display:flex;gap:12px}
-.item .n{font-weight:700;color:var(--accent);min-width:20px;font-variant-numeric:tabular-nums}
-.item small{display:block;color:var(--sub);font-size:13px;font-weight:400;margin-top:3px}
-.item.hero{background:var(--ink);color:#fff}
-.item.hero .n{color:#ff4d6a}
+.el{position:absolute;left:140px;top:600px;width:280px;height:280px}
+svg{display:block;width:100%;height:100%;overflow:visible}
+svg *{transform-box:fill-box;transform-origin:center}
 
-/* ---------- 처벌 표 ---------- */
-.rows{display:grid;grid-template-columns:1fr 1fr;column-gap:56px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:16px;
-  padding:13px 0;border-bottom:1px solid var(--line);font-size:15.5px;font-weight:500}
-.pill{font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:99px;
-  background:var(--accent-soft);color:var(--accent);white-space:nowrap}
-.pill.dark{background:var(--ink);color:#fff}
-
-/* ---------- 공통 카드 ---------- */
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.card{border:1px solid var(--line);border-radius:18px;padding:26px}
-.card h3{font-size:13px;color:var(--sub);font-weight:600;margin-bottom:12px}
-.card p{font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:13.5px;font-weight:600;padding:7px 12px;border-radius:99px;background:var(--card)}
-
-/* ---------- 폴란드볼 ---------- */
-.ballwrap{height:190px;display:flex;align-items:flex-end;margin-bottom:28px}
-.ball{width:130px;height:130px;border-radius:50%;position:relative;
-  background:linear-gradient(#fff 50%,var(--accent) 50%);border:4px solid var(--ink);
-  animation:bounce 1.6s cubic-bezier(.5,0,.5,1) infinite}
-.eye{position:absolute;top:32%;width:28px;height:28px;background:#fff;
-  border:3.5px solid var(--ink);border-radius:50%;animation:blink 4s infinite}
-.eye.l{left:24%}.eye.r2{left:54%}
-@keyframes bounce{
-  0%,100%{transform:translateY(0) scale(1.08,.92)}
-  12%{transform:translateY(0) scale(1)}
-  50%{transform:translateY(-50px) scale(.97,1.03)}
-  88%{transform:translateY(0) scale(1)}}
-@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
-.shadow{width:110px;height:10px;border-radius:50%;background:#000;opacity:.08;
-  margin:-6px 0 0 14px;animation:sh 1.6s cubic-bezier(.5,0,.5,1) infinite}
-@keyframes sh{0%,100%{transform:scale(1)}50%{transform:scale(.6);opacity:.04}}
-
-/* ---------- 엔딩 ---------- */
-.big{font-size:clamp(36px,6vw,80px);font-weight:800;letter-spacing:-.04em;line-height:1.15}
-.hl{position:relative;display:inline-block}
-.hl::after{content:"";position:absolute;left:0;bottom:.06em;height:.14em;width:100%;
-  background:var(--accent);z-index:-1;transform:scaleX(0);transform-origin:left;
-  transition:transform .9s cubic-bezier(.7,0,.2,1) .9s}
-.scene.active .hl::after{transform:scaleX(1)}
-.link{display:inline-block;margin-top:32px;font-size:14px;font-weight:600;color:var(--ink);
-  text-decoration:none;border-bottom:1.5px solid var(--ink);padding-bottom:2px}
-
-@media (max-width:820px){
-  .rows{grid-template-columns:1fr}
-  .cards{grid-template-columns:1fr}
-  .row,.item{font-size:14px;padding-top:10px;padding-bottom:10px}
-  .hint{display:none}
-}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinr{to{transform:rotate(-360deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.55)}}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes turn{0%,40%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
+@keyframes eq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes sweep{0%{transform:scaleX(0)}45%,55%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+@keyframes wave{0%,100%{transform:scale(.4);opacity:.2}50%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
-
-<div class="top"><span>COUNTRYBALL <b>CHANNEL RULES</b></span><span id="count">01 / 08</span></div>
-
-<!-- 0. 인트로 -->
-<section class="scene">
-  <div class="ballwrap r"><div><div class="ball"><span class="eye l"></span><span class="eye r2"></span></div><div class="shadow"></div></div></div>
-  <div class="tag r">ARCA.LIVE / COUNTRYBALL</div>
-  <div class="big r">컨트리볼 채널<br>규정 요약</div>
-</section>
-
-<!-- 1. 공통 -->
-<section class="scene">
-  <div class="tag r">00 · COMMON</div>
-  <div class="title r">공통 사항</div>
-  <div class="cards">
-    <div class="card r"><h3>건의 · 신고 · 소명 · 홍보 · 합작</h3><p>폴란드볼<br>번역 채널</p></div>
-    <div class="card r"><h3>국기색 기준</h3><p>국기색<br>검색기</p></div>
-    <div class="card r"><h3>공식 산하 채널</h3>
-      <div class="chips"><span class="chip">폴란드볼 번역</span><span class="chip">지리그림</span><span class="chip">컨트리볼 게임</span><span class="chip">폴망호</span><span class="chip">지자체볼</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- 2. 일반 규정 -->
-<section class="scene">
-  <div class="tag r">01 · GENERAL</div>
-  <div class="title r">일반 규정</div>
-  <div class="rows">
-    <div class="row r">성적인 문구 · 사진 · 아카콘<span class="pill dark">1년</span></div>
-    <div class="row r">차단 회피<span class="pill dark">IP 1년</span></div>
-    <div class="row r">도배<span class="pill">전체 삭제 · 1주</span></div>
-    <div class="row r">과도한 친목 · 인신공격<span class="pill">2주 이상</span></div>
-    <div class="row r">닉언<span class="pill">1주 이상</span></div>
-    <div class="row r">무분별한 투표글<span class="pill">최대 1주</span></div>
-    <div class="row r">타 채널 갈등 유발<span class="pill">1주 이상</span></div>
-    <div class="row r">헤이트 스피치<span class="pill">1주 이상</span></div>
-    <div class="row r">테러 · 반달 · 컨트리휴먼<span class="pill">1주 이상</span></div>
-    <div class="row r">혐오감 주는 글<span class="pill">1주 이상</span></div>
-    <div class="row r">허가받지 않은 홍보<span class="pill">1주 이상</span></div>
-    <div class="row r">채널 역사 언급 · 미성년자 공개<span class="pill">삭제</span></div>
-  </div>
-  <div class="desc r">완장 재량에 따라 1주 → 2주 → 1달 순으로 처벌이 무거워질 수 있습니다.</div>
-</section>
-
-<!-- 3. 창작 규정 -->
-<section class="scene">
-  <div class="tag r">02 · CREATION</div>
-  <div class="title r">창작 규정</div>
-  <div class="grid">
-    <div class="item hero r"><span class="n">01</span>폴란드는 우주에 갈 수 없음</div>
-    <div class="item r"><span class="n">02</span>모양 툴 사용 금지</div>
-    <div class="item r"><span class="n">03</span><div>국기는 직접 그리기<small>복붙 · 변형 · 생략 금지</small></div></div>
-    <div class="item r"><span class="n">04</span><div>신체 부위 추가 금지<small>팔 · 다리 · 입 · 눈썹</small></div></div>
-    <div class="item r"><span class="n">05</span>컨트리휴먼 절대 금지</div>
-    <div class="item r"><span class="n">06</span>채우기 툴 사용, 구분선 지우기</div>
-    <div class="item r"><span class="n">07</span>정확한 국기색 사용</div>
-    <div class="item r"><span class="n">08</span>원형이 아닌 볼은 그 모양 지키기</div>
-    <div class="item r"><span class="n">09</span>정해진 장신구 지키기</div>
-    <div class="item r"><span class="n">10</span>트레이싱 · 실사 사진 금지</div>
-    <div class="item r"><span class="n">11</span>당구공은 1 · 6 · 7 · 8번만</div>
-    <div class="item r"><span class="n">12</span><div>자작국 · 자캐볼 금지<small>마이크로네이션은 시랜드만</small></div></div>
-    <div class="item r"><span class="n">13</span>안티에일리어싱 끄기 · PNG 저장</div>
-    <div class="item r"><span class="n">14</span>에어브러시 자제</div>
-    <div class="item r"><span class="n">15</span>뉴비는 2주 동안 뉴비존</div>
-  </div>
-</section>
-
-<!-- 4. 번역 규정 -->
-<section class="scene">
-  <div class="tag r">03 · TRANSLATION</div>
-  <div class="title r">번역 규정</div>
-  <div class="grid">
-    <div class="item r"><span class="n">01</span><div>출처 반드시 밝히기<small>원작자를 알 수 있게</small></div></div>
-    <div class="item r"><span class="n">02</span><div>워터마크 넣기 권장<small>"번역: 컨트리볼 채널"만 써도 OK</small></div></div>
-    <div class="item r"><span class="n">03</span><div>번역자 개인 언급 금지<small>개인 전용 워터마크도 금지</small></div></div>
-  </div>
-</section>
-
-<!-- 5. 위키 규정 -->
-<section class="scene">
-  <div class="tag r">04 · WIKI</div>
-  <div class="title r">위키 규정</div>
-  <div class="grid">
-    <div class="item r"><span class="n">01</span><div>지정된 국기색만 사용<small>국기색 검색기 참고</small></div></div>
-    <div class="item r"><span class="n">02</span>완장 승인 후 본인이 직접 업로드</div>
-    <div class="item r"><span class="n">03</span>1:1 비율, PNG 권장</div>
-    <div class="item r"><span class="n">04</span>합작 이미지는 투명 배경 PNG 필수</div>
-  </div>
-</section>
-
-<!-- 6. 폴망호 -->
-<section class="scene">
-  <div class="tag r">05 · POLMANGHO</div>
-  <div class="title r">폴망호 규정</div>
-  <div class="grid">
-    <div class="item r"><span class="n">01</span>개최는 관리진만 가능</div>
-    <div class="item r"><span class="n">02</span><div>아카 닉네임으로 참가 불가<small>magma.com은 예외</small></div></div>
-    <div class="item r"><span class="n">03</span>친목용 채널 아님</div>
-  </div>
-</section>
-
-<!-- 7. 엔딩 -->
-<section class="scene">
-  <div class="tag r">CONTACT</div>
-  <div class="big r">건의 · 신고 · 소명은</div>
-  <div class="big r"><span class="hl">폴란드볼 번역 채널</span></div>
-  <div class="r"><a class="link" href="https://arca.live/b/polandballtranslate" target="_blank">arca.live/b/polandballtranslate →</a></div>
-</section>
-
-<div class="progress"></div>
-<div class="hint">← → 이동 · Space 일시정지</div>
+<div id="stage"></div>
 
 <script>
-const scenes=[...document.querySelectorAll('.scene')];
-const bar=document.querySelector('.progress');
-const count=document.getElementById('count');
+const S=[
+ {type:'intro'},
+ {type:'kv',tag:'COMMON',title:'공통 사항',desc:'모든 문의는 한 곳으로',el:'ring',items:[
+   ['건의 · 신고 · 소명 · 홍보 · 합작','폴란드볼 번역 채널'],
+   ['국기색 기준','국기색 검색기'],
+   ['공식 산하 채널','번역 · 지리그림 · 게임 · 폴망호 · 지자체볼']]},
+ {type:'pen',tag:'GENERAL',title:'일반 규정',desc:'위반 시 처벌 기준',el:'bars',items:[
+   ['성적인 문구 · 사진 · 아카콘','1년 차단',1],
+   ['차단 회피','회피 계정 · IP 1년',1],
+   ['도배','전체 삭제 · 1주'],
+   ['과도한 친목 · 인신공격','2주 이상'],
+   ['닉언','1주 이상'],
+   ['무분별한 투표글','최대 1주'],
+   ['타 채널 갈등 유발','1주 이상']]},
+ {type:'pen',tag:'GENERAL',title:'일반 규정',desc:'완장 재량으로<br>1주 → 2주 → 1달 가중처벌',el:'squares',start:8,items:[
+   ['헤이트 스피치','1주 이상'],
+   ['테러 · 반달 · 컨트리휴먼','1주 이상'],
+   ['혐오감을 주는 글','1주 이상'],
+   ['허가받지 않은 홍보','1주 이상'],
+   ['채널 역사 언급','삭제'],
+   ['미성년자임을 밝히는 글','수정 · 삭제']]},
+ {type:'list',tag:'CREATION',title:'창작 규정',desc:'작품 제작 기본 규칙',el:'cross',items:[
+   ['폴란드는 우주에 갈 수 없음','',1],
+   ['모양 툴 사용 금지','사각형 · 원형 · 직선 툴'],
+   ['국기는 직접 그리기','복붙 · 변형 · 생략 금지'],
+   ['신체 부위 추가 금지','팔 · 다리 · 입 · 눈썹 · 홍채'],
+   ['컨트리휴먼 절대 금지','게시 시 추가 제재']]},
+ {type:'list',tag:'CREATION',title:'창작 규정',desc:'색과 형태',el:'dots',start:6,items:[
+   ['채우기 툴 사용 · 구분선 제거',''],
+   ['정확한 국기색 사용','국기색 검색기 참고'],
+   ['비원형 컨트리볼 모양 지키기','이스라엘 · 네팔 · 카자흐스탄 등'],
+   ['지정 장신구 지키기','그 외 장신구는 가격표 권장'],
+   ['트레이싱 · 실사 사진 금지','']]},
+ {type:'list',tag:'CREATION',title:'창작 규정',desc:'국내 정치 성향과<br>선정적 장면은 금지',el:'lines',start:11,items:[
+   ['당구공은 1 · 6 · 7 · 8번만',''],
+   ['자작국 · 자캐볼 금지','마이크로네이션은 시랜드만'],
+   ['안티에일리어싱 끄기 · PNG 저장',''],
+   ['에어브러시 자제','투명도 조절 · 그림판 스프레이 권장'],
+   ['뉴비는 2주간 뉴비존','완장 승인 시 다른 탭 가능']]},
+ {type:'list',tag:'TRANSLATION',title:'번역 규정',desc:'번역물 게시 시 지킬 것',el:'squares',items:[
+   ['출처 반드시 명시','원작자를 알 수 있게'],
+   ['워터마크 삽입 권장','"번역: 컨트리볼 채널"만 적어도 가능'],
+   ['번역자 개인 언급 금지','채널명 · 채널 주소만 표기'],
+   ['개인 워터마크 독점 사용 금지','친목 · 네임드화 방지']]},
+ {type:'list',tag:'WIKI',title:'위키 규정',desc:'채널 위키 이미지 규정',el:'bars',items:[
+   ['지정된 국기색만 사용','국기색 검색기 참고'],
+   ['업로드 전 완장 승인','합작위키 탭에서 승인'],
+   ['승인 후 본인이 직접 업로드',''],
+   ['1:1 비율 · PNG 권장',''],
+   ['합작 이미지는 투명 배경 PNG','']]},
+ {type:'list',tag:'POLMANGHO',title:'폴망호 규정',desc:'컨트리볼 채널 규정 준용',el:'ring',items:[
+   ['개최는 관리진만 가능','일반 유저 개최 불가'],
+   ['아카 닉네임으로 참가 불가','magma.com은 예외'],
+   ['친목 목적 채널 아님',''],
+   ['컨휴 · 할카스 발견 시 제보','']]},
+ {type:'end'}
+];
 
-scenes.forEach((s,i)=>{
-  s.querySelectorAll('.r').forEach((el,j)=>el.style.setProperty('--i',j));
-  const seg=document.createElement('div');
-  seg.className='seg'; seg.innerHTML='<i></i>';
-  seg.onclick=e=>{e.stopPropagation();go(i)};
-  bar.appendChild(seg);
-});
-const fills=[...bar.querySelectorAll('i')];
-
-let cur=0,timer,start,remain,paused=false;
-const dur=i=>2600+scenes[i].querySelectorAll('.r').length*420;
-
-function go(i){
-  i=(i+scenes.length)%scenes.length;
-  cur=i; paused=false; document.body.classList.remove('paused');
-  scenes.forEach((s,k)=>s.classList.toggle('active',k===i));
-  fills.forEach((f,k)=>{f.style.transition='none';f.style.width=k<i?'100%':'0%'});
-  count.textContent=String(i+1).padStart(2,'0')+' / '+String(scenes.length).padStart(2,'0');
-  remain=dur(i); run();
+const R='#e4002b',K='#0e0e10',L='#ececee';
+function shape(t){
+  let o='';
+  switch(t){
+  case 'ring':
+    return `<svg viewBox="0 0 280 280">
+      <circle cx="140" cy="140" r="120" fill="none" stroke="${L}" stroke-width="2"/>
+      <g style="animation:spin 6s linear infinite"><circle cx="140" cy="140" r="120" fill="none" stroke="${R}" stroke-width="10" stroke-linecap="round" stroke-dasharray="190 564"/></g>
+      <circle cx="140" cy="140" r="22" fill="${K}" style="animation:pulse 2.4s ease-in-out infinite"/></svg>`;
+  case 'squares':
+    for(let i=0;i<9;i++){const x=20+(i%3)*90,y=20+Math.floor(i/3)*90;
+      const c=i===4?R:([0,2,6,8].includes(i)?K:L);
+      const a=i===4?`pop .6s ${i*70}ms both, turn 3s 1.2s ease-in-out infinite`:`pop .6s ${i*70}ms both`;
+      o+=`<rect x="${x}" y="${y}" width="70" height="70" rx="6" fill="${c}" style="animation:${a}"/>`}
+    return `<svg viewBox="0 0 280 280">${o}</svg>`;
+  case 'bars':
+    for(let i=0;i<5;i++)o+=`<rect x="${20+i*54}" y="20" width="32" height="240" rx="4" fill="${i===2?R:K}" style="transform-origin:center bottom;animation:eq 1.6s ${-i*.25}s ease-in-out infinite"/>`;
+    return `<svg viewBox="0 0 280 280">${o}</svg>`;
+  case 'lines':
+    [240,170,220,120,200,150].forEach((w,i)=>o+=`<rect x="20" y="${30+i*42}" width="${w}" height="10" rx="5" fill="${i===2?R:K}" style="transform-origin:left center;animation:sweep 3.2s ${i*.15}s cubic-bezier(.7,0,.3,1) infinite"/>`);
+    return `<svg viewBox="0 0 280 280">${o}</svg>`;
+  case 'cross':
+    return `<svg viewBox="0 0 280 280">
+      <rect x="40" y="40" width="200" height="200" fill="none" stroke="${K}" stroke-width="2" style="animation:spin 12s linear infinite"/>
+      <rect x="90" y="90" width="100" height="100" fill="${R}" style="animation:spinr 6s linear infinite"/></svg>`;
+  case 'dots':
+    for(let i=0;i<6;i++)for(let j=0;j<6;j++)o+=`<circle cx="${30+i*44}" cy="${30+j*44}" r="9" fill="${i===j?R:K}" style="animation:wave 2s ${(i+j)*.1}s ease-in-out infinite"/>`;
+    return `<svg viewBox="0 0 280 280">${o}</svg>`;
+  case 'intro':
+    for(let i=0;i<5;i++)o+=`<circle cx="${300+i*40}" cy="490" r="8" fill="${K}" style="animation:wave 1.8s ${i*.12}s ease-in-out infinite"/>`;
+    return `<svg viewBox="0 0 540 540">
+      <circle cx="270" cy="250" r="230" fill="none" stroke="${L}" stroke-width="2"/>
+      <g style="animation:spin 14s linear infinite"><circle cx="270" cy="250" r="230" fill="none" stroke="${K}" stroke-width="4" stroke-linecap="round" stroke-dasharray="140 1305"/></g>
+      <circle cx="320" cy="200" r="100" fill="${R}" style="animation:pop .9s .3s both"/>
+      <rect x="120" y="260" width="140" height="140" fill="${K}" style="animation:pop .9s .5s both, spin 14s 1.4s linear infinite"/>
+      ${o}</svg>`;
+  }
 }
-function run(){
-  clearTimeout(timer);
-  const f=fills[cur]; void f.offsetWidth;
-  f.style.transition=`width ${remain}ms linear`; f.style.width='100%';
-  start=Date.now(); timer=setTimeout(()=>go(cur+1),remain);
+
+const pad=n=>String(n).padStart(2,'0');
+function leftCol(s){
+  return `<div class="abs tag fit" data-a style="left:140px;top:200px;width:560px">${s.tag}</div>
+  <div class="abs title fit" data-a style="left:140px;top:250px;width:560px">${s.title}</div>
+  <div class="abs desc" data-a style="left:140px;top:400px;width:480px">${s.desc}</div>
+  <div class="el" data-a>${shape(s.el)}</div>`;
 }
-function togglePause(){
-  paused=!paused; document.body.classList.toggle('paused',paused);
-  if(paused){
-    clearTimeout(timer); remain-=Date.now()-start;
-    const f=fills[cur]; const w=getComputedStyle(f).width;
-    f.style.transition='none'; f.style.width=w;
-  } else run();
+function render(s){
+  const d=document.createElement('div');d.className='scene';
+  const st=s.start||1;
+  if(s.type==='intro'){
+    d.innerHTML=`
+    <div class="abs tag fit" data-a style="left:140px;top:380px;width:1000px">ARCA.LIVE / COUNTRYBALL</div>
+    <div class="abs title fit" data-a style="left:140px;top:430px;width:1000px;font-size:140px">컨트리볼 채널</div>
+    <div class="abs title fit" data-a style="left:140px;top:584px;width:1000px;font-size:140px">규정 요약</div>
+    <div class="abs desc fit" data-a style="left:140px;top:780px;width:1000px">일반 · 창작 · 번역 · 위키 · 폴망호</div>
+    <div class="abs" data-a style="left:1240px;top:260px;width:540px;height:540px">${shape('intro')}</div>`;
+  }
+  else if(s.type==='end'){
+    d.innerHTML=`
+    <div class="abs tag fit" data-a style="left:140px;top:300px;width:1300px">CONTACT</div>
+    <div class="abs title fit" data-a style="left:140px;top:350px;width:1300px;font-size:92px;font-weight:700">건의 · 신고 · 소명은</div>
+    <div class="abs title fit" data-a style="left:140px;top:470px;width:1300px;font-size:128px"><span id="endTxt" style="display:inline-block">폴란드볼 번역 채널</span></div>
+    <div class="abs" data-a style="left:140px;top:640px;height:12px" id="barW"><i id="bar" style="display:block;height:100%;background:${R};transform-origin:left;transform:scaleX(0)"></i></div>
+    <div class="abs desc fit" data-a style="left:140px;top:690px;width:1300px;font-size:30px">arca.live/b/polandballtranslate</div>
+    <div class="abs" data-a style="left:1520px;top:410px;width:260px;height:260px">${shape('dots')}</div>`;
+  }
+  else{
+    let rows='';
+    if(s.type==='kv') s.items.forEach((it,k)=>rows+=`
+      <div class="row" data-a style="height:150px;grid-template-columns:72px minmax(0,1fr)">
+        <span class="n">${pad(k+1)}</span>
+        <div class="cell"><div class="lab fit">${it[0]}</div><div class="t fit" style="font-size:40px;font-weight:700">${it[1]}</div></div>
+        <i class="ln"></i></div>`);
+    if(s.type==='pen') s.items.forEach((it,k)=>rows+=`
+      <div class="row" data-a style="height:92px">
+        <span class="n">${pad(st+k)}</span>
+        <div class="cell"><div class="t fit">${it[0]}</div></div>
+        <span class="p ${it[2]?'k':''}">${it[1]}</span>
+        <i class="ln"></i></div>`);
+    if(s.type==='list'){
+      const h=s.items.some(i=>i[1])?112:96;
+      s.items.forEach((it,k)=>rows+=`
+      <div class="row" data-a style="height:${h}px;grid-template-columns:72px minmax(0,1fr)">
+        <span class="n">${pad(st+k)}</span>
+        <div class="cell"><div class="t fit ${it[2]?'hl':''}">${it[0]}</div>${it[1]?`<div class="s fit">${it[1]}</div>`:''}</div>
+        <i class="ln"></i></div>`);
+    }
+    d.innerHTML=leftCol(s)+`<div class="list">${rows}</div>`;
+  }
+  return d;
 }
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight') go(cur+1);
-  else if(e.key==='ArrowLeft') go(cur-1);
-  else if(e.code==='Space'){e.preventDefault();togglePause();}
-});
-document.addEventListener('click',e=>{
-  if(e.target.closest('a')) return;
-  e.clientX>innerWidth/2 ? go(cur+1) : go(cur-1);
-});
+function fit(root){
+  root.querySelectorAll('.fit').forEach(el=>{
+    let fs=parseFloat(getComputedStyle(el).fontSize);
+    while(el.scrollWidth>el.clientWidth+1&&fs>12){fs--;el.style.fontSize=fs+'px'}
+  });
+}
 
-go(0);
+const stage=document.getElementById('stage');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const EIN='cubic-bezier(.2,.8,.2,1)',EOUT='cubic-bezier(.5,0,.75,0)';
+
+function resize(){stage.style.transform=`scale(${Math.min(innerWidth/1920,innerHeight/1080)})`}
+addEventListener('resize',resize);resize();
+
+async function play(s){
+  const root=render(s);
+  stage.appendChild(root);fit(root);
+
+  if(s.type==='end'){
+    document.getElementById('barW').style.width=document.getElementById('endTxt').offsetWidth+'px';
+  }
+
+  const items=[...root.querySelectorAll('[data-a]')];
+  const rowsN=root.querySelectorAll('.row').length;
+  const enterT=items.length*90+800;
+  const hold=s.type==='intro'?2600:s.type==='end'?3800:2200+rowsN*700;
+
+  items.forEach((el,k)=>el.animate(
+    [{opacity:0,transform:'translateY(28px)'},{opacity:1,transform:'none'}],
+    {duration:800,delay:k*90,easing:EIN,fill:'both'}));
+  root.querySelectorAll('.ln').forEach((el,k)=>el.animate(
+    [{transform:'scaleX(0)'},{transform:'scaleX(1)'}],
+    {duration:1000,delay:k*90+300,easing:EIN,fill:'both'}));
+  const bar=document.getElementById('bar');
+  if(bar) bar.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],
+    {duration:900,delay:900,easing:'cubic-bezier(.7,0,.2,1)',fill:'forwards'});
+
+  await sleep(enterT+hold);
+
+  const outs=items.map((el,k)=>el.animate(
+    [{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-16px)'}],
+    {duration:450,delay:k*25,easing:EOUT,fill:'forwards'}));
+  await Promise.all(outs.map(a=>a.finished));
+  root.remove();
+  await sleep(250);
+}
+
+(async()=>{
+  await document.fonts.ready;
+  let i=0;
+  while(true){ await play(S[i]); i=(i+1)%S.length; }
+})();
 </script>
 </body>
 </html>
