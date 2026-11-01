@@ -33,18 +33,27 @@ body{font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;color:va
 .row .ln{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--line);transform-origin:left}
 .cell{min-width:0}
 
-.el{position:absolute;left:140px;top:600px;width:280px;height:280px}
-svg{display:block;width:100%;height:100%;overflow:visible}
+.el{position:absolute;left:140px;top:590px;width:300px;height:300px}
+svg{display:block;width:100%;height:100%;overflow:visible;font-family:Pretendard,sans-serif}
 svg *{transform-box:fill-box;transform-origin:center}
+.d{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .9s .4s cubic-bezier(.6,0,.2,1) forwards}
 
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes spinr{to{transform:rotate(-360deg)}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.55)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes drawLoop{0%{stroke-dashoffset:1;opacity:1}55%,85%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
-@keyframes turn{0%,40%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
-@keyframes eq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
-@keyframes sweep{0%{transform:scaleX(0)}45%,55%{transform:scaleX(1)}100%{transform:scaleX(0)}}
-@keyframes wave{0%,100%{transform:scale(.4);opacity:.2}50%{transform:scale(1);opacity:1}}
+@keyframes wipe{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes wipeY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes wipeLoop{0%{transform:scaleX(0);opacity:1}40%,85%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes growLoop{0%{transform:scaleY(0)}25%,85%{transform:scaleY(1)}100%{transform:scaleY(0)}}
+@keyframes sweepLoop{0%{transform:scaleX(0)}40%,80%{transform:scaleX(1)}100%{transform:scaleX(0)}}
+@keyframes wave{0%,100%{transform:scale(.4);opacity:.25}50%{transform:scale(1);opacity:1}}
+@keyframes ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.2);opacity:0}}
+@keyframes drop{
+  0%{transform:translate(0,0);opacity:0}
+  6%{opacity:1}
+  26%{transform:translate(var(--dx),var(--dy));opacity:1}
+  33%,100%{transform:translate(var(--dx),var(--dy));opacity:0}}
 </style>
 </head>
 <body>
@@ -53,11 +62,11 @@ svg *{transform-box:fill-box;transform-origin:center}
 <script>
 const S=[
  {type:'intro'},
- {type:'kv',tag:'COMMON',title:'공통 사항',desc:'모든 문의는 한 곳으로',el:'ring',items:[
+ {type:'kv',tag:'COMMON',title:'공통 사항',desc:'모든 문의는 한 곳으로',el:'inbox',items:[
    ['건의 · 신고 · 소명 · 홍보 · 합작','폴란드볼 번역 채널'],
    ['국기색 기준','국기색 검색기'],
    ['공식 산하 채널','번역 · 지리그림 · 게임 · 폴망호 · 지자체볼']]},
- {type:'pen',tag:'GENERAL',title:'일반 규정',desc:'위반 시 처벌 기준',el:'bars',items:[
+ {type:'pen',tag:'GENERAL',title:'일반 규정',desc:'위반 시 처벌 기준',el:'ban',items:[
    ['성적인 문구 · 사진 · 아카콘','1년 차단',1],
    ['차단 회피','회피 계정 · IP 1년',1],
    ['도배','전체 삭제 · 1주'],
@@ -65,43 +74,43 @@ const S=[
    ['닉언','1주 이상'],
    ['무분별한 투표글','최대 1주'],
    ['타 채널 갈등 유발','1주 이상']]},
- {type:'pen',tag:'GENERAL',title:'일반 규정',desc:'완장 재량으로<br>1주 → 2주 → 1달 가중처벌',el:'squares',start:8,items:[
+ {type:'pen',tag:'GENERAL',title:'일반 규정',desc:'완장 재량으로<br>1주 → 2주 → 1달 가중처벌',el:'steps',start:8,items:[
    ['헤이트 스피치','1주 이상'],
    ['테러 · 반달 · 컨트리휴먼','1주 이상'],
    ['혐오감을 주는 글','1주 이상'],
    ['허가받지 않은 홍보','1주 이상'],
    ['채널 역사 언급','삭제'],
    ['미성년자임을 밝히는 글','수정 · 삭제']]},
- {type:'list',tag:'CREATION',title:'창작 규정',desc:'작품 제작 기본 규칙',el:'cross',items:[
+ {type:'list',tag:'CREATION',title:'창작 규정',desc:'작품 제작 기본 규칙',el:'rocket',items:[
    ['폴란드는 우주에 갈 수 없음','',1],
    ['모양 툴 사용 금지','사각형 · 원형 · 직선 툴'],
    ['국기는 직접 그리기','복붙 · 변형 · 생략 금지'],
    ['신체 부위 추가 금지','팔 · 다리 · 입 · 눈썹 · 홍채'],
    ['컨트리휴먼 절대 금지','게시 시 추가 제재']]},
- {type:'list',tag:'CREATION',title:'창작 규정',desc:'색과 형태',el:'dots',start:6,items:[
+ {type:'list',tag:'CREATION',title:'창작 규정',desc:'색과 형태',el:'fill',start:6,items:[
    ['채우기 툴 사용 · 구분선 제거',''],
    ['정확한 국기색 사용','국기색 검색기 참고'],
    ['비원형 컨트리볼 모양 지키기','이스라엘 · 네팔 · 카자흐스탄 등'],
    ['지정 장신구 지키기','그 외 장신구는 가격표 권장'],
    ['트레이싱 · 실사 사진 금지','']]},
- {type:'list',tag:'CREATION',title:'창작 규정',desc:'국내 정치 성향과<br>선정적 장면은 금지',el:'lines',start:11,items:[
+ {type:'list',tag:'CREATION',title:'창작 규정',desc:'국내 정치 성향과<br>선정적 장면은 금지',el:'billiard',start:11,items:[
    ['당구공은 1 · 6 · 7 · 8번만',''],
    ['자작국 · 자캐볼 금지','마이크로네이션은 시랜드만'],
    ['안티에일리어싱 끄기 · PNG 저장',''],
    ['에어브러시 자제','투명도 조절 · 그림판 스프레이 권장'],
    ['뉴비는 2주간 뉴비존','완장 승인 시 다른 탭 가능']]},
- {type:'list',tag:'TRANSLATION',title:'번역 규정',desc:'번역물 게시 시 지킬 것',el:'squares',items:[
+ {type:'list',tag:'TRANSLATION',title:'번역 규정',desc:'번역물 게시 시 지킬 것',el:'translate',items:[
    ['출처 반드시 명시','원작자를 알 수 있게'],
    ['워터마크 삽입 권장','"번역: 컨트리볼 채널"만 적어도 가능'],
    ['번역자 개인 언급 금지','채널명 · 채널 주소만 표기'],
    ['개인 워터마크 독점 사용 금지','친목 · 네임드화 방지']]},
- {type:'list',tag:'WIKI',title:'위키 규정',desc:'채널 위키 이미지 규정',el:'bars',items:[
+ {type:'list',tag:'WIKI',title:'위키 규정',desc:'채널 위키 이미지 규정',el:'doc',items:[
    ['지정된 국기색만 사용','국기색 검색기 참고'],
    ['업로드 전 완장 승인','합작위키 탭에서 승인'],
    ['승인 후 본인이 직접 업로드',''],
    ['1:1 비율 · PNG 권장',''],
    ['합작 이미지는 투명 배경 PNG','']]},
- {type:'list',tag:'POLMANGHO',title:'폴망호 규정',desc:'컨트리볼 채널 규정 준용',el:'ring',items:[
+ {type:'list',tag:'POLMANGHO',title:'폴망호 규정',desc:'컨트리볼 채널 규정 준용',el:'canvas',items:[
    ['개최는 관리진만 가능','일반 유저 개최 불가'],
    ['아카 닉네임으로 참가 불가','magma.com은 예외'],
    ['친목 목적 채널 아님',''],
@@ -109,45 +118,128 @@ const S=[
  {type:'end'}
 ];
 
+/* ================= 내용 관련 그래픽 ================= */
 const R='#e4002b',K='#0e0e10',L='#ececee';
 function shape(t){
   let o='';
   switch(t){
-  case 'ring':
+
+  /* 인트로: 국기 4개가 칠해지고 국기색 팔레트 등장 */
+  case 'flags':{
+    const hz=(x,y,c,d)=>c.forEach((col,i)=>o+=`<rect x="${x}" y="${y+i*150/c.length}" width="240" height="${150/c.length+.5}" fill="${col}" style="transform-origin:left center;animation:wipe .7s ${d+i*.12}s cubic-bezier(.7,0,.2,1) both"/>`);
+    const vt=(x,y,c,d)=>c.forEach((col,i)=>o+=`<rect x="${x+i*80}" y="${y}" width="80.5" height="150" fill="${col}" style="transform-origin:center top;animation:wipeY .7s ${d+i*.12}s cubic-bezier(.7,0,.2,1) both"/>`);
+    hz(20,40,['#FFFFFF','#DC143C'],.2);
+    vt(280,40,['#002654','#FFFFFF','#ED2939'],.5);
+    hz(20,220,['#000000','#DD0000','#FFCE00'],.8);
+    vt(280,220,['#009246','#FFFFFF','#CE2B37'],1.1);
+    [[20,40],[280,40],[20,220],[280,220]].forEach(([x,y])=>o+=`<rect x="${x}" y="${y}" width="240" height="150" fill="none" stroke="${L}" stroke-width="2"/>`);
+    ['#DC143C','#002654','#ED2939','#000000','#DD0000','#FFCE00','#009246','#CE2B37','#0e0e10'].forEach((c,i)=>
+      o+=`<circle cx="${40+i*57.5}" cy="450" r="18" fill="${c}" style="animation:pop .5s ${1.6+i*.07}s both"/>`);
+    return `<svg viewBox="0 0 540 540">${o}</svg>`;}
+
+  /* 공통: 건의·신고·소명이 한 곳(받은편지함)으로 */
+  case 'inbox':
+    [['건의',20,R],['신고',104,K],['소명',188,K]].forEach(([txt,x,c],i)=>{
+      const dx=140-(x+36),dy=137;
+      o+=`<g style="--dx:${dx}px;--dy:${dy}px;animation:drop 3.6s ${i*1.2}s infinite both">
+        <rect x="${x}" y="20" width="72" height="36" rx="18" fill="${c}"/>
+        <text x="${x+36}" y="45" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">${txt}</text></g>`;});
+    return `<svg viewBox="0 0 280 280">${o}
+      <path d="M40 160 L40 240 L240 240 L240 160 L190 160 L175 192 L105 192 L90 160 Z" fill="#fff" stroke="${K}" stroke-width="6" stroke-linejoin="round"/></svg>`;
+
+  /* 일반 1: 금지 표시가 말풍선 위로 그어짐 */
+  case 'ban':
     return `<svg viewBox="0 0 280 280">
-      <circle cx="140" cy="140" r="120" fill="none" stroke="${L}" stroke-width="2"/>
-      <g style="animation:spin 6s linear infinite"><circle cx="140" cy="140" r="120" fill="none" stroke="${R}" stroke-width="10" stroke-linecap="round" stroke-dasharray="190 564"/></g>
-      <circle cx="140" cy="140" r="22" fill="${K}" style="animation:pulse 2.4s ease-in-out infinite"/></svg>`;
-  case 'squares':
-    for(let i=0;i<9;i++){const x=20+(i%3)*90,y=20+Math.floor(i/3)*90;
-      const c=i===4?R:([0,2,6,8].includes(i)?K:L);
-      const a=i===4?`pop .6s ${i*70}ms both, turn 3s 1.2s ease-in-out infinite`:`pop .6s ${i*70}ms both`;
-      o+=`<rect x="${x}" y="${y}" width="70" height="70" rx="6" fill="${c}" style="animation:${a}"/>`}
-    return `<svg viewBox="0 0 280 280">${o}</svg>`;
-  case 'bars':
-    for(let i=0;i<5;i++)o+=`<rect x="${20+i*54}" y="20" width="32" height="240" rx="4" fill="${i===2?R:K}" style="transform-origin:center bottom;animation:eq 1.6s ${-i*.25}s ease-in-out infinite"/>`;
-    return `<svg viewBox="0 0 280 280">${o}</svg>`;
-  case 'lines':
-    [240,170,220,120,200,150].forEach((w,i)=>o+=`<rect x="20" y="${30+i*42}" width="${w}" height="10" rx="5" fill="${i===2?R:K}" style="transform-origin:left center;animation:sweep 3.2s ${i*.15}s cubic-bezier(.7,0,.3,1) infinite"/>`);
-    return `<svg viewBox="0 0 280 280">${o}</svg>`;
-  case 'cross':
+      <g style="animation:float 3s ease-in-out infinite">
+        <path d="M85 95 h110 a18 18 0 0 1 18 18 v50 a18 18 0 0 1 -18 18 h-60 l-26 22 v-22 h-24 a18 18 0 0 1 -18 -18 v-50 a18 18 0 0 1 18 -18z" fill="none" stroke="${K}" stroke-width="6" stroke-linejoin="round"/>
+        <circle cx="115" cy="138" r="7" fill="${K}"/><circle cx="140" cy="138" r="7" fill="${K}"/><circle cx="165" cy="138" r="7" fill="${K}"/>
+      </g>
+      <circle cx="140" cy="140" r="118" fill="none" stroke="${R}" stroke-width="14" pathLength="1" class="d"/>
+      <line x1="57" y1="57" x2="223" y2="223" stroke="${R}" stroke-width="14" stroke-linecap="round" pathLength="1" class="d" style="animation-delay:1.1s"/></svg>`;
+
+  /* 일반 2: 가중처벌 1주 → 2주 → 1달 */
+  case 'steps':
+    [[30,160,70,'1주',K],[110,100,130,'2주',K],[190,30,200,'1달',R]].forEach(([x,y,h,l,c],i)=>o+=`
+      <rect x="${x}" y="${y}" width="60" height="${h}" rx="6" fill="${c}" style="transform-origin:center bottom;animation:growLoop 4.5s ${i*.3}s cubic-bezier(.6,0,.2,1) infinite both"/>
+      <text x="${x+30}" y="266" text-anchor="middle" font-size="22" font-weight="700" fill="${c}">${l}</text>`);
+    return `<svg viewBox="0 0 280 280"><line x1="20" y1="232" x2="260" y2="232" stroke="${L}" stroke-width="3"/>${o}</svg>`;
+
+  /* 창작 1: 폴란드는 우주에 갈 수 없음 */
+  case 'rocket':
     return `<svg viewBox="0 0 280 280">
-      <rect x="40" y="40" width="200" height="200" fill="none" stroke="${K}" stroke-width="2" style="animation:spin 12s linear infinite"/>
-      <rect x="90" y="90" width="100" height="100" fill="${R}" style="animation:spinr 6s linear infinite"/></svg>`;
-  case 'dots':
-    for(let i=0;i<6;i++)for(let j=0;j<6;j++)o+=`<circle cx="${30+i*44}" cy="${30+j*44}" r="9" fill="${i===j?R:K}" style="animation:wave 2s ${(i+j)*.1}s ease-in-out infinite"/>`;
+      <g style="animation:float 2.4s ease-in-out infinite">
+        <path d="M120 165 L140 210 L160 165 Z" fill="${R}" style="animation:wave .5s ease-in-out infinite"/>
+        <path d="M105 135 L80 178 L107 166 Z M175 135 L200 178 L173 166 Z" fill="${K}"/>
+        <path d="M140 40 C172 70 182 112 175 165 L105 165 C98 112 108 70 140 40 Z" fill="#fff" stroke="${K}" stroke-width="6" stroke-linejoin="round"/>
+        <circle cx="140" cy="105" r="15" fill="none" stroke="${K}" stroke-width="6"/>
+      </g>
+      <circle cx="140" cy="140" r="122" fill="none" stroke="${R}" stroke-width="14" pathLength="1" class="d" style="animation-delay:.8s"/>
+      <line x1="54" y1="54" x2="226" y2="226" stroke="${R}" stroke-width="14" stroke-linecap="round" pathLength="1" class="d" style="animation-delay:1.5s"/></svg>`;
+
+  /* 창작 2: 채우기 툴 + 정확한 국기색 */
+  case 'fill':
+    return `<svg viewBox="0 0 280 280">
+      <rect x="40" y="40" width="200" height="130" fill="#fff"/>
+      <rect x="40" y="105" width="200" height="65" fill="#DC143C" style="transform-origin:left center;animation:wipeLoop 3.4s cubic-bezier(.7,0,.3,1) infinite"/>
+      <rect x="40" y="40" width="200" height="130" fill="none" stroke="${K}" stroke-width="4"/>
+      <rect x="40" y="205" width="46" height="46" rx="10" fill="#DC143C" style="animation:pop .6s .4s both"/>
+      <text x="102" y="238" font-size="28" font-weight="700" fill="${K}" font-family="ui-monospace,Menlo,Consolas,monospace" style="animation:pop .6s .6s both">#DC143C</text></svg>`;
+
+  /* 창작 3: 허용 당구공 1 · 6 · 7 · 8 */
+  case 'billiard':
+    [[80,80,'#F2C200',1],[200,80,'#1E8E3E',6],[80,200,'#8B1E2D',7],[200,200,'#0e0e10',8]].forEach(([x,y,c,n],i)=>o+=`
+      <g style="animation:pop .6s ${.2+i*.15}s both"><g style="animation:float 2.8s ${i*.35}s ease-in-out infinite">
+        <circle cx="${x}" cy="${y}" r="52" fill="${c}"/>
+        <circle cx="${x}" cy="${y}" r="24" fill="#fff"/>
+        <text x="${x}" y="${y+9}" text-anchor="middle" font-size="26" font-weight="800" fill="${K}">${n}</text>
+      </g></g>`);
     return `<svg viewBox="0 0 280 280">${o}</svg>`;
-  case 'intro':
-    for(let i=0;i<5;i++)o+=`<circle cx="${300+i*40}" cy="490" r="8" fill="${K}" style="animation:wave 1.8s ${i*.12}s ease-in-out infinite"/>`;
-    return `<svg viewBox="0 0 540 540">
-      <circle cx="270" cy="250" r="230" fill="none" stroke="${L}" stroke-width="2"/>
-      <g style="animation:spin 14s linear infinite"><circle cx="270" cy="250" r="230" fill="none" stroke="${K}" stroke-width="4" stroke-linecap="round" stroke-dasharray="140 1305"/></g>
-      <circle cx="320" cy="200" r="100" fill="${R}" style="animation:pop .9s .3s both"/>
-      <rect x="120" y="260" width="140" height="140" fill="${K}" style="animation:pop .9s .5s both, spin 14s 1.4s linear infinite"/>
+
+  /* 번역: A → 가 */
+  case 'translate':
+    return `<svg viewBox="0 0 280 280">
+      <g style="animation:pop .6s .2s both"><g style="animation:float 3s ease-in-out infinite">
+        <rect x="20" y="25" width="150" height="110" rx="22" fill="${K}"/>
+        <path d="M50 130 L50 165 L88 130 Z" fill="${K}"/>
+        <text x="95" y="100" text-anchor="middle" font-size="56" font-weight="800" fill="#fff">A</text>
+      </g></g>
+      <g style="animation:pop .6s .7s both"><g style="animation:float 3s 1.5s ease-in-out infinite">
+        <rect x="110" y="150" width="150" height="105" rx="22" fill="${R}"/>
+        <path d="M230 250 L232 280 L196 250 Z" fill="${R}"/>
+        <text x="185" y="222" text-anchor="middle" font-size="54" font-weight="800" fill="#fff">가</text>
+      </g></g></svg>`;
+
+  /* 위키: 문서 + 승인 체크 */
+  case 'doc':
+    [[65,100,K],[95,80,K],[125,100,K],[155,60,L]].forEach(([y,w,c],i)=>o+=`<rect x="75" y="${y}" width="${w}" height="10" rx="5" fill="${c}" style="transform-origin:left center;animation:sweepLoop 3.6s ${i*.15}s cubic-bezier(.7,0,.3,1) infinite"/>`);
+    return `<svg viewBox="0 0 280 280">
+      <rect x="50" y="25" width="150" height="200" rx="14" fill="#fff" stroke="${K}" stroke-width="5"/>${o}
+      <g style="animation:pop .6s .8s both">
+        <circle cx="205" cy="212" r="46" fill="${R}"/>
+        <path d="M184 213 l15 15 l27 -29" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="1" class="d" style="animation-delay:1.3s"/>
+      </g></svg>`;
+
+  /* 폴망호: 그림 맞히기 캔버스 */
+  case 'canvas':
+    for(let i=0;i<3;i++)o+=`<circle cx="${110+i*30}" cy="248" r="9" fill="${K}" style="animation:wave 1.4s ${i*.18}s ease-in-out infinite"/>`;
+    return `<svg viewBox="0 0 280 280">
+      <rect x="25" y="30" width="230" height="170" rx="14" fill="none" stroke="${K}" stroke-width="5"/>
+      <path d="M55 150 C80 70 110 70 120 120 S160 170 175 100 S215 60 225 130" fill="none" stroke="${R}" stroke-width="8" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;animation:drawLoop 3.4s ease-in-out infinite"/>
       ${o}</svg>`;
+
+  /* 엔딩: 편지 + 알림 */
+  case 'mail':
+    return `<svg viewBox="0 0 280 280">
+      <rect x="30" y="75" width="200" height="140" rx="12" fill="none" stroke="${K}" stroke-width="6"/>
+      <path d="M38 85 L130 155 L222 85" fill="none" stroke="${K}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" pathLength="1" class="d"/>
+      <g style="animation:pop .6s 1.1s both">
+        <circle cx="228" cy="78" r="24" fill="${R}" style="animation:ping 1.6s 1.7s ease-out infinite"/>
+        <circle cx="228" cy="78" r="24" fill="${R}"/>
+      </g></svg>`;
   }
 }
 
+/* ================= 장면 ================= */
 const pad=n=>String(n).padStart(2,'0');
 function leftCol(s){
   return `<div class="abs tag fit" data-a style="left:140px;top:200px;width:560px">${s.tag}</div>
@@ -164,7 +256,7 @@ function render(s){
     <div class="abs title fit" data-a style="left:140px;top:430px;width:1000px;font-size:140px">컨트리볼 채널</div>
     <div class="abs title fit" data-a style="left:140px;top:584px;width:1000px;font-size:140px">규정 요약</div>
     <div class="abs desc fit" data-a style="left:140px;top:780px;width:1000px">일반 · 창작 · 번역 · 위키 · 폴망호</div>
-    <div class="abs" data-a style="left:1240px;top:260px;width:540px;height:540px">${shape('intro')}</div>`;
+    <div class="abs" data-a style="left:1240px;top:270px;width:540px;height:540px">${shape('flags')}</div>`;
   }
   else if(s.type==='end'){
     d.innerHTML=`
@@ -173,7 +265,7 @@ function render(s){
     <div class="abs title fit" data-a style="left:140px;top:470px;width:1300px;font-size:128px"><span id="endTxt" style="display:inline-block">폴란드볼 번역 채널</span></div>
     <div class="abs" data-a style="left:140px;top:640px;height:12px" id="barW"><i id="bar" style="display:block;height:100%;background:${R};transform-origin:left;transform:scaleX(0)"></i></div>
     <div class="abs desc fit" data-a style="left:140px;top:690px;width:1300px;font-size:30px">arca.live/b/polandballtranslate</div>
-    <div class="abs" data-a style="left:1520px;top:410px;width:260px;height:260px">${shape('dots')}</div>`;
+    <div class="abs" data-a style="left:1500px;top:390px;width:280px;height:280px">${shape('mail')}</div>`;
   }
   else{
     let rows='';
@@ -218,15 +310,12 @@ addEventListener('resize',resize);resize();
 async function play(s){
   const root=render(s);
   stage.appendChild(root);fit(root);
-
-  if(s.type==='end'){
-    document.getElementById('barW').style.width=document.getElementById('endTxt').offsetWidth+'px';
-  }
+  if(s.type==='end') document.getElementById('barW').style.width=document.getElementById('endTxt').offsetWidth+'px';
 
   const items=[...root.querySelectorAll('[data-a]')];
   const rowsN=root.querySelectorAll('.row').length;
   const enterT=items.length*90+800;
-  const hold=s.type==='intro'?2600:s.type==='end'?3800:2200+rowsN*700;
+  const hold=s.type==='intro'?3200:s.type==='end'?3800:2400+rowsN*700;
 
   items.forEach((el,k)=>el.animate(
     [{opacity:0,transform:'translateY(28px)'},{opacity:1,transform:'none'}],
